@@ -92,4 +92,25 @@ export class ApiService {
     }
     return this.http.post(`${this.baseUrl}/products/${productId}/upload-image`, formData, { headers });
   }
+
+  // User management endpoints
+  getUsers(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/user`, { headers: this.getHeaders() });
+  }
+
+  createUser(user: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/user/admin/create`, user, { headers: this.getHeaders() });
+  }
+
+  updateUserRole(userId: number, roleId: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/user/admin/${userId}/role`, roleId, { headers: this.getHeaders() });
+  }
+
+  toggleUserStatus(userId: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/user/admin/${userId}/status`, {}, { headers: this.getHeaders() });
+  }
+
+  deleteUser(userId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/user/admin/${userId}`, { headers: this.getHeaders(), responseType: 'text' });
+  }
 }
