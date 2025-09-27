@@ -55,7 +55,7 @@ export class ApiService {
   }
 
   deleteProduct(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/products/${id}`, { headers: this.getHeaders() });
+    return this.http.delete(`${this.baseUrl}/products/${id}`, { headers: this.getHeaders(), responseType: 'text' });
   }
 
   // Roles endpoints
@@ -112,5 +112,31 @@ export class ApiService {
 
   deleteUser(userId: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/user/admin/${userId}`, { headers: this.getHeaders(), responseType: 'text' });
+  }
+
+  // Product export/import endpoints
+  exportProducts(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/products/export`, { 
+      headers: this.getHeaders(), 
+      responseType: 'blob' 
+    });
+  }
+
+  importProducts(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = localStorage.getItem('token');
+    const headers: { [key: string]: string } = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return this.http.post(`${this.baseUrl}/products/import`, formData, { headers, responseType: 'text' });
+  }
+
+  downloadProductTemplate(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/products/template`, { 
+      headers: this.getHeaders(), 
+      responseType: 'blob' 
+    });
   }
 }

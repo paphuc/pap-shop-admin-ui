@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../services/api.service';
+import { ProductService } from '../services/product.service';
 
 interface Product {
   id: string;
   name: string;
+  sku: string;
   price: number;
   categoryId: number;
   category?: string;
@@ -72,11 +74,26 @@ interface Category {
       </div>
 
       <div class="card">
+        <h3>Import/Export sản phẩm</h3>
+        <div class="import-export-section">
+          <div class="action-group">
+            <button class="btn btn-success" (click)="downloadTemplate()">Tải template Excel</button>
+            <button class="btn btn-primary" (click)="exportProducts()">Xuất Excel</button>
+          </div>
+          <div class="import-section">
+            <input type="file" class="form-control" (change)="onImportFileSelect($event)" accept=".xlsx,.xls" #importFileInput>
+            <button class="btn btn-warning" (click)="importProducts()" [disabled]="!importFile">Nhập từ Excel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
         <h3>Danh sách sản phẩm</h3>
         <table class="table">
           <thead>
             <tr>
               <th>ID</th>
+              <th>SKU</th>
               <th>Tên</th>
               <th>Giá</th>
               <th>Danh mục</th>
@@ -86,10 +103,11 @@ interface Category {
           </thead>
           <tbody>
             <tr *ngIf="isLoading">
-              <td colspan="6" class="text-center">Đang tải...</td>
+              <td colspan="7" class="text-center">Đang tải...</td>
             </tr>
             <tr *ngFor="let product of products" [hidden]="isLoading">
               <td>{{product.id}}</td>
+              <td>{{product.sku}}</td>
               <td>{{product.name}}</td>
               <td>{{product.price | currency:'VND':'symbol':'1.0-0'}}</td>
               <td>{{product.category}}</td>
@@ -100,7 +118,7 @@ interface Category {
               </td>
             </tr>
             <tr *ngIf="!isLoading && products.length === 0">
-              <td colspan="6" class="text-center">Chưa có sản phẩm nào</td>
+              <td colspan="7" class="text-center">Chưa có sản phẩm nào</td>
             </tr>
           </tbody>
         </table>
@@ -184,18 +202,42 @@ interface Category {
       margin-top: 0;
       color: #333;
     }
+    .import-export-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .action-group {
+      display: flex;
+      gap: 10px;
+    }
+    .import-section {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn-success {
+      background-color: #28a745;
+      color: white;
+    }
+    .btn-warning {
+      background-color: #ffc107;
+      color: #212529;
+    }
   `]
 })
 export class ProductsComponent implements OnInit {
   products: Product[] = [];
   categories: Category[] = [];
-  currentProduct: Product = { id: '', name: '', price: null as any, categoryId: 0, stock: null as any };
+  currentProduct: Product = { id: '', name: '', sku: '', price: null as any, categoryId: 0, stock: null as any };
   selectedFile: File | null = null;
   selectedProductId: string = '';
+  importFile: File | null = null;
   isEditing = false;
   isLoading = true;
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private productService: ProductService) {}
 
   ngOnInit() {
     this.loadCategories();
@@ -219,6 +261,7 @@ export class ProductsComponent implements OnInit {
         this.products = products.map((p: any) => ({
           id: p.id,
           name: p.name,
+          sku: p.sku || 'N/A',
           price: p.price,
           categoryId: p.category?.id || 0,
           category: p.category?.name || 'N/A',
@@ -305,7 +348,7 @@ export class ProductsComponent implements OnInit {
   }
 
   resetForm() {
-    this.currentProduct = { id: '', name: '', price: null as any, categoryId: 0, stock: null as any };
+    this.currentProduct = { id: '', name: '', sku: '', price: null as any, categoryId: 0, stock: null as any };
     this.isEditing = false;
   }
 
@@ -315,5 +358,70 @@ export class ProductsComponent implements OnInit {
       this.selectedFile = file;
       console.log('File selected:', file.name);
     }
+  }
+
+  onImportFileSelect(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.importFile = file;
+      console.log('Import file selected:', file.name);
+    }
+  }
+
+  downloadTemplate() {
+    this.productService.downloadTemplate().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'product-import-template.xlsx';
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Error downloading template:', error);
+        alert('Lỗi khi tải template!');
+      }
+    });
+  }
+
+  exportProducts() {
+    this.productService.exportProducts().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'products.xlsx';
+        link.click();
+        window.URL.revokeObjectURL(url);
+        alert('Xuất file Excel thành công!');
+      },
+      error: (error) => {
+        console.error('Error exporting products:', error);
+        alert('Lỗi khi xuất file Excel!');
+      }
+    });
+  }
+
+  importProducts() {
+    if (!this.importFile) {
+      alert('Vui lòng chọn file Excel để nhập!');
+      return;
+    }
+
+    this.productService.importProducts(this.importFile).subscribe({
+      next: (response) => {
+        console.log('Import response:', response);
+        alert('Nhập sản phẩm thành công: ' + response);
+        this.loadProducts();
+        this.importFile = null;
+        const fileInput = document.querySelector('#importFileInput') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
+      },
+      error: (error) => {
+        console.error('Error importing products:', error);
+        alert('Lỗi khi nhập sản phẩm: ' + (error.error || error.message));
+      }
+    });
   }
 }

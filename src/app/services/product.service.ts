@@ -42,4 +42,16 @@ export class ProductService {
   deleteProduct(id: number): Observable<any> {
     return this.apiService.deleteProduct(id);
   }
+
+  exportProducts(): Observable<Blob> {
+    return this.apiService.exportProducts();
+  }
+
+  importProducts(file: File): Observable<any> {
+    return this.apiService.importProducts(file);
+  }
+
+  downloadTemplate(): Observable<Blob> {
+    return this.apiService.downloadProductTemplate();
+  }
 }
