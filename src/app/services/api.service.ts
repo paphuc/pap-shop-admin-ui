@@ -12,10 +12,13 @@ export class ApiService {
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
-    return new HttpHeaders({
+    console.log('API Service - Token:', token ? 'exists' : 'not found');
+    const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` })
     });
+    console.log('API Service - Headers:', headers);
+    return headers;
   }
 
   // Auth endpoints

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ApiService } from '../services/api.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -131,7 +133,11 @@ export class DashboardComponent implements OnInit {
   recentOrders: any[] = [];
   isLoading = true;
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadDashboardData();
@@ -145,6 +151,9 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading dashboard stats:', error);
+        if (error.status === 401) {
+          this.handleUnauthorized();
+        }
       }
     });
 
@@ -163,8 +172,16 @@ export class DashboardComponent implements OnInit {
       error: (error) => {
         console.error('Error loading recent orders:', error);
         this.isLoading = false;
+        if (error.status === 401) {
+          this.handleUnauthorized();
+        }
       }
     });
+  }
+
+  private handleUnauthorized() {
+    this.authService.logoutLocal();
+    this.router.navigate(['/login']);
   }
 
   getStatusText(status: string): string {
