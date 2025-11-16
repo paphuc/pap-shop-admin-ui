@@ -17,7 +17,10 @@ import { Observable } from 'rxjs';
         <ul class="navbar-nav">
           <li><a routerLink="/dashboard" routerLinkActive="active" class="nav-link">Dashboard</a></li>
           <li><a routerLink="/products" routerLinkActive="active" class="nav-link">Sản phẩm</a></li>
+          <li><a routerLink="/categories" routerLinkActive="active" class="nav-link">Danh mục</a></li>
+          <li><a routerLink="/orders" routerLinkActive="active" class="nav-link">Đơn hàng</a></li>
           <li><a routerLink="/users" routerLinkActive="active" class="nav-link">Người dùng</a></li>
+          <li><a routerLink="/announcements" routerLinkActive="active" class="nav-link">Thông báo</a></li>
         </ul>
         <div class="navbar-actions">
           <button class="btn btn-outline-light" (click)="logout()">Đăng xuất</button>

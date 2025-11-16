@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+tmp/
+out-tsc/
+
+# Angular
+.angular/
+.sass-cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime data
+*.pid
+*.seed
+*.pid.lock
+
+# API Documentation (generated from backend)
+api-docs.json
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Optional: package-lock.json (discuss with team)
+# package-lock.json

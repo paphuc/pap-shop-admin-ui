@@ -1,0 +1,122 @@
+<div class="announcement-admin">
+  <div class="header">
+    <h1>Quản Lý Thông Báo</h1>
+    <button class="btn-primary" (click)="openCreateForm()">
+      + Tạo Thông Báo Mới
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <p>Đang tải...</p>
+  </div>
+
+  <!-- Form Modal -->
+  <div class="modal" *ngIf="showForm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>{{ isEditing ? 'Chỉnh Sửa' : 'Tạo Mới' }} Thông Báo</h2>
+        <button class="close-btn" (click)="closeForm()">×</button>
+      </div>
+
+      <form [formGroup]="announcementForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label>Tiêu đề *</label>
+          <input 
+            type="text" 
+            formControlName="title" 
+            placeholder="Nhập tiêu đề thông báo"
+            class="form-control">
+          <div class="error" *ngIf="announcementForm.get('title')?.invalid && announcementForm.get('title')?.touched">
+            Tiêu đề là bắt buộc
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Nội dung *</label>
+          <textarea 
+            formControlName="message" 
+            rows="4"
+            placeholder="Nhập nội dung thông báo"
+            class="form-control"></textarea>
+          <div class="error" *ngIf="announcementForm.get('message')?.invalid && announcementForm.get('message')?.touched">
+            Nội dung là bắt buộc
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>ID Sản phẩm (tùy chọn)</label>
+          <input 
+            type="number" 
+            formControlName="productId" 
+            placeholder="Nhập ID sản phẩm nếu có"
+            class="form-control">
+          <small>Để trống nếu thông báo không liên quan đến sản phẩm cụ thể</small>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="closeForm()">
+            Hủy
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="announcementForm.invalid">
+            {{ isEditing ? 'Cập Nhật' : 'Tạo Mới' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Announcement List -->
+  <div class="announcement-list" *ngIf="!loading">
+    <div class="empty" *ngIf="announcements.length === 0">
+      <p>Chưa có thông báo nào</p>
+    </div>
+
+    <table class="announcement-table" *ngIf="announcements.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tiêu đề</th>
+          <th>Nội dung</th>
+          <th>Sản phẩm</th>
+          <th>Trạng thái</th>
+          <th>Ngày tạo</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let announcement of announcements">
+          <td>{{ announcement.id }}</td>
+          <td>{{ announcement.title }}</td>
+          <td class="message-cell">{{ announcement.message }}</td>
+          <td>
+            <span *ngIf="announcement.productName">
+              {{ announcement.productName }} (#{{ announcement.productId }})
+            </span>
+            <span *ngIf="!announcement.productName" class="text-muted">-</span>
+          </td>
+          <td>
+            <span class="badge" [class.badge-active]="announcement.isActive" [class.badge-inactive]="!announcement.isActive">
+              {{ announcement.isActive ? 'Đang hiển thị' : 'Đã ẩn' }}
+            </span>
+          </td>
+          <td>{{ formatDate(announcement.createdAt) }}</td>
+          <td class="actions">
+            <button class="btn-icon btn-edit" (click)="openEditForm(announcement)" title="Chỉnh sửa">
+              ✏️
+            </button>
+            <button 
+              class="btn-icon btn-toggle" 
+              (click)="toggleActive(announcement)"
+              [title]="announcement.isActive ? 'Ẩn' : 'Hiển thị'">
+              {{ announcement.isActive ? '👁️' : '🚫' }}
+            </button>
+            <button class="btn-icon btn-delete" (click)="deleteAnnouncement(announcement.id)" title="Xóa">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
