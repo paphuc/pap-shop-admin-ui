@@ -290,7 +290,17 @@ export class ProductsComponent implements OnInit {
     };
 
     if (this.isEditing) {
-      console.log('Update product:', productData);
+      this.apiService.updateProduct(this.currentProduct.sku, productData).subscribe({
+        next: (product) => {
+          console.log('Product updated:', product);
+          this.loadProducts();
+          this.resetForm();
+        },
+        error: (error) => {
+          console.error('Error updating product:', error);
+          alert('Lỗi khi cập nhật sản phẩm!');
+        }
+      });
     } else {
       this.apiService.addProduct(productData).subscribe({
         next: (product) => {

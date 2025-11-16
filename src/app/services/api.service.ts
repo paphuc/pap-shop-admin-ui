@@ -84,6 +84,22 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/category`);
   }
 
+  getCategory(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/category/${id}`);
+  }
+
+  addCategory(category: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/category`, category, { headers: this.getHeaders() });
+  }
+
+  updateCategory(id: number, category: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/category/${id}`, category, { headers: this.getHeaders() });
+  }
+
+  deleteCategory(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/category/${id}`, { headers: this.getHeaders() });
+  }
+
   // Product image upload
   uploadProductImage(productId: number, file: File): Observable<any> {
     const formData = new FormData();
@@ -141,5 +157,92 @@ export class ApiService {
       headers: this.getHeaders(), 
       responseType: 'blob' 
     });
+  }
+
+  // Order management endpoints
+  getOrders(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/orders`, { headers: this.getHeaders() });
+  }
+
+  getAllOrders(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/orders/admin/all`, { headers: this.getHeaders() });
+  }
+
+  getOrder(orderId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/orders/${orderId}`, { headers: this.getHeaders() });
+  }
+
+  updateOrderStatus(orderId: number, status: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/orders/${orderId}/status?status=${status}`, {}, { headers: this.getHeaders() });
+  }
+
+  // User profile endpoints
+  getUserProfile(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/user/profile`, { headers: this.getHeaders() });
+  }
+
+  getUser(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/user/${id}`, { headers: this.getHeaders() });
+  }
+
+  updateUser(user: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/user/update`, user, { headers: this.getHeaders() });
+  }
+
+  // Role management endpoints
+  updateRole(role: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/role/update`, role, { headers: this.getHeaders() });
+  }
+
+  // Product by category
+  getProductsByCategory(categoryId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/products/category/${categoryId}`);
+  }
+
+  // Product images management
+  getProductImages(productId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/products/${productId}/images`, { headers: this.getHeaders() });
+  }
+
+  addProductImage(productId: number, imageUrl: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/products/${productId}/images`, { imageUrl }, { headers: this.getHeaders() });
+  }
+
+  deleteProductImage(imageId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/products/images/${imageId}`, { headers: this.getHeaders() });
+  }
+
+  // Reviews management endpoints
+  getProductReviews(productId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/reviews/products/${productId}`);
+  }
+
+  addReview(productId: number, review: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/reviews/products/${productId}`, review, { headers: this.getHeaders() });
+  }
+
+  updateReview(reviewId: number, review: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/reviews/${reviewId}`, review, { headers: this.getHeaders() });
+  }
+
+  deleteReview(reviewId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/reviews/${reviewId}`, { headers: this.getHeaders() });
+  }
+
+  // Password management endpoints
+  changePassword(passwordData: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/user/update/password`, passwordData, { headers: this.getHeaders(), responseType: 'text' });
+  }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/user/forgot-password`, { email }, { responseType: 'text' });
+  }
+
+  validateResetCode(code: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/user/validate-reset-code`, { code }, { responseType: 'text' });
+  }
+
+  resetPassword(resetData: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/user/reset-password`, resetData, { responseType: 'text' });
   }
 }
